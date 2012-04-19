@@ -55,11 +55,12 @@ class SMALL_RECT {
 		NumPut(This.Top,    Data, Ofs+=2, "Short")
 		NumPut(This.Right,  Data, Ofs+=2, "Short")
 		NumPut(This.Bottom, Data, Ofs+=2, "Short")
+		Ofs+=2
 		
 		if (_Log.Logs("Output"))
 			_Log.Output("Data", "`n" var_Hex_Dump(&Data, 0, SMALL_RECT.Size))
 		
-		return _Log.Exit(Data)
+		return _Log.Exit(Ofs)
 	}
 ;}}}
 

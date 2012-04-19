@@ -46,11 +46,12 @@ class COORD {
 		VarSetCapacity(Data, 4, 0)
 		NumPut(This.X, Data, Ofs:=0, "Short")
 		NumPut(This.Y, Data, Ofs+=2, "Short")
+		Ofs+=2
 		
 		if (_Log.Logs())
 			_Log.All("Data:`n" var_Hex_Dump(&Data, 0, COORD.Size))
 		
-		return _Log.Exit(COORD.Size)
+		return _Log.Exit(Ofs)
 	}
 	;}}}
 }
