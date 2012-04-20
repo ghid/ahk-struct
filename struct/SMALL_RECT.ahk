@@ -7,7 +7,7 @@ typedef struct _SMALL_RECT {
   SHORT Bottom;
 } SMALL_RECT;
 */
-class SMALL_RECT {
+class SMALL_RECT extends Struct {
 	static Size := 8
 	
 	Left   := 0

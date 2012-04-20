@@ -5,7 +5,7 @@ typedef struct _COORD {
   SHORT Y;
 } COORD, *PCOORD;
 */
-class COORD {
+class COORD  extends Struct {
 	static Size := 4
 	X := 0
 	Y := 0

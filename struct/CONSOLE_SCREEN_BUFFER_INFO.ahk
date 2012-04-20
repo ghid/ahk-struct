@@ -1,5 +1,6 @@
-#Include D:\work\AutoHotkey\Projects\Struct\COORD.ahk
-#Include D:\work\AutoHotkey\Projects\Struct\SMALL_RECT.ahk
+#Include <Struct>
+#Include <struct\COORD>
+#Include <struct\SMALL_RECT>
 
 ;{{{ CONSOLE_SCREEN_BUFFER_INFO
 /*
@@ -11,7 +12,7 @@ typedef struct _CONSOLE_SCREEN_BUFFER_INFO {
   COORD      dwMaximumWindowSize;
 } CONSOLE_SCREEN_BUFFER_INFO;
 */
-class CONSOLE_SCREEN_BUFFER_INFO {
+class CONSOLE_SCREEN_BUFFER_INFO extends Struct {
 	static Size := 24
 	
 	; Character Attributes
@@ -48,26 +49,14 @@ class CONSOLE_SCREEN_BUFFER_INFO {
 		if (_Log.Logs("Input"))
 			_Log.Input("Data", "...`n" var_Hex_Dump(&Data, 0, CONSOLE_SCREEN_BUFFER_INFO.Size))
 			
-		VarSetCapacity(_Data, COORD.Size, 0)
-		sys_MemMove(_Data, Data, 0, Ofs:=0, COORD.Size)
-		_Log.Finest("Coord_Size = " Object(This.Coord_Size))
-		This.Coord_Size.Set(_Data)
-		sys_MemMove(_Data, Data, 0, Ofs+=COORD.Size, COORD.Size)
-		This.Coord_CursorPosition.Set(_Data)
-		
-		This.Attributes := NumGet(Data, Ofs+=COORD.Size, "UInt")
-		
-		VarSetCapacity(_Data, SMALL_RECT.Size, 0)
-		sys_MemMove(_Data, Data, 0, Ofs+=4, SMALL_RECT.Size)
-		This.Small_Rect_Window.Set(_Data)
-		
-		VarSetCapacity(_Data, COORD.Size, 0)
-		sys_MemMove(_Data, Data, 0, Ofs+=SMALL_RECT.Size, COORD.Size)
-		This.Coord_Maximum_Window_Size.Set(_Data)
-		*/
-		Ofs+=COORD.Size
+		Len := Base.StructGet(This.Coord_Size, Data, Ofs:=0)
+		Len := Base.StructGet(This.Coord_CursorPosition, Data, Ofs+=Len)		
+		; This.Attributes := NumGet(Data, Ofs+=Len, "UInt")
+		Len := Base.FieldGet(This.Attributes, Data, Ofs+=Len, "UInt")
+		Len := Base.StructGet(This.Small_Rect_Window, Data, Ofs+=4)
+		Len := Base.StructGet(This.Coord_Maximum_Window_Size, Data, Ofs+=Len)		
 			
-		return _Log.Exit(Ofs)
+		return _Log.Exit(Ofs + Len)
 	}
 	
 	Get(ByRef Data) {
