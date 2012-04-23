@@ -1,4 +1,9 @@
-;{{{ Coord
+/*
+:encoding=UTF-8:
+:subdir=struct:
+*/
+
+;{{{ COORD class
 /*
 typedef struct _COORD {
   SHORT X;
@@ -6,52 +11,62 @@ typedef struct _COORD {
 } COORD, *PCOORD;
 */
 class COORD  extends Struct {
+	
 	static Size := 4
+	
 	X := 0
 	Y := 0
 	
 	;{{{ __New
-	__New(ByRef Data = "") {
-		_Log := new Logger("struct.class." A_ThisFunc)
+	__New(ByRef pData = "") {
+		_log := new Logger("struct.class." A_ThisFunc)
 		
-		if (Data)
-			This.Set(Data)
+		if (pData <> "")
+			this.Set(pData)
 
-		_Log.Exit(This)
+		_log.Exit(this)
 	}
 	;}}}
 	
 	;{{{ Set
-	Set(ByRef Data) {
-		_Log := new Logger("struct.class." A_ThisFunc)
+	Set(ByRef pData) {
+		_log := new Logger("struct.class." A_ThisFunc)
 		
-		if (_Log.Logs())
-			_Log.All("Data:`n" var_Hex_Dump(&Data, 0, COORD.Size))
+		if (_log.Logs("Input")) {
+			_log.Input("&pData", &pData)
+			if (_log.Logs())
+				_log.All("pData:`n" var_Hex_Dump(&pData, 0, sizeof(COORD)))
+		}
 			
-		This.X := NumGet(Data, Ofs:=0, "Short")
-		This.Y := NumGet(Data, Ofs+=2, "Short")
-		if (_Log.Logs("Finest")) {
-			_Log.Finest("X = " This.X)
-			_Log.Finest("Y = " This.Y)
+		this.MemberGet(pData, _ofs:=0, this, "X", "Short")
+		this.MemberGet(pData, _ofs,    this, "Y", "Short")
+		if (_log.Logs("Finest")) {
+			_log.Finest("X = " this.X)
+			_log.Finest("Y = " this.Y)
 		}
 
-		return _Log.Exit()
+		return _log.Exit()
 	}
 	;}}}
 
 	;{{{ Get
-	Get(ByRef Data) {
-		_Log := new Logger("struct.class." A_ThisFunc)
+	Get(ByRef pData) {
+		_log := new Logger("struct.class." A_ThisFunc)
 		
-		VarSetCapacity(Data, 4, 0)
-		NumPut(This.X, Data, Ofs:=0, "Short")
-		NumPut(This.Y, Data, Ofs+=2, "Short")
-		Ofs+=2
+		iLength := sizeof(COORD)
+		if (_log.Logs("Finest")) {
+			_log.Finest("iLength = " iLength)
+			_log.Finest("X = " this.X)
+			_log.Finest("Y = " this.Y)
+		}
+		VarSetCapacity(pData, iLength, 0)
+		this.MemberSet(this.X, pData, _ofs:=0, "Short")
+		this.MemberSet(this.Y, pData, _ofs,    "Short")
 		
-		if (_Log.Logs())
-			_Log.All("Data:`n" var_Hex_Dump(&Data, 0, COORD.Size))
+		if (_log.Logs())
+			_log.All("Data:`n" var_Hex_Dump(&pData, 0, iLength))
 		
-		return _Log.Exit(Ofs)
+		return _Log.Exit()
 	}
 	;}}}
 }

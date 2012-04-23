@@ -1,57 +1,120 @@
+/*
+:encoding=UTF-8:
+*/
+
+;{{{ Struct class
 class Struct {
 	
 	;{{{ StructGet
-	StructGet(ByRef Target_Struct, ByRef Source, Source_Ofs) {
-		_Log := new Logger("struct.class." A_ThisFunc)
+	StructGet(ByRef pSource, ByRef pOffset, ByRef pTarget) {
+		_log := new Logger("struct.class." A_ThisFunc)
 		
-		if (_Log.Logs("Input")) {
-			_Log.Input("&Source", "&" &Source)
-			if (_Log.Logs())
-				_Log.All("`n" var_Hex_Dump(&Source, Source_Ofs, Len))
-			_Log.Input("Source_Ofs", Source_Ofs)
+		if (_log.Logs("Input")) {
+			_log.Input("&pSource", &pSource)
+			if (_log.Logs())
+				_log.All("pSource:`n" var_Hex_Dump(&pSource, pOffset, pTarget.Size))
+			_log.Input("pOffset", pOffset)
 		}
 		
-		Len := Target_Struct.Size
-		_Log.Finer("Len = " Len)
-		VarSetCapacity(Data, Len)
-		DllCall("RtlMoveMemory", "Ptr", &Data, "Ptr", &Source+Source_Ofs, "UInt", Len)
+		iLength := pTarget.Size
+		_log.Finer("iLength = " iLength)
+		VarSetCapacity(_data, iLength)
+		DllCall("RtlMoveMemory", "Ptr", &_data, "Ptr", &pSource+pOffset, "UInt", iLength)
 		
-		if (_Log.Logs())
-			_Log.All("Data:`n" var_Hex_Dump(&Data, 0, Len))
+		if (_log.Logs())
+			_log.All("_data:`n" var_Hex_Dump(&_data, 0, iLength))
 			
-		Target_Struct.Set(Data)
+		pTarget.Set(_data)
+		pOffset += iLength
 		
-		return _Log.Exit(Len)
+		return _log.Exit()
 	}
 	;}}}
-
-	FieldGet(ByRef Target_Field, ByRef Source, Source_Ofs, Data_Type) {
-		_Log := new Logger("struct.class." A_ThisFunc)
+	
+	;{{{ MemberGet
+	MemberGet(ByRef pSource, ByRef pOffset, ByRef pTarget, pKey, pDataType) {
+		_log := new Logger("struct.class." A_ThisFunc)
 		
-		if (_Log.Logs("Input")) {
-			_Log.Input("&Source", "&" &Source)
-			if (_Log.Logs())
-				_Log.All("`n" var_Hex_Dump(&Source, Source_Ofs, Len))
-			_Log.Input("Source_Ofs", Source_Ofs)
-			_Log.Input("Data_Type", Data_Type)
+		if (_log.Logs("Input")) {
+			_log.Input("&pSource", &pSource)
+			if (_log.Logs())
+				_log.All("pSource:`n" var_Hex_Dump(&pSource, pOffset, sizeof(pDataType)))
+			_log.Input("pOffset", pOffset)
+			_log.Input("pKey", pKey)
+			_log.Input("pDataType", pDataType)
 		}
 		
-		if Data_Type = Ptr
-			Len := A_PtrSize
-		else if Data_Type in Int64,Double
-			Len := 8
-		else if Data_Type in Int,UInt,Float
-			Len := 4
-		else if Data_Type in Short,UShort
-			Len := 2
-		else if Data_Type in Char,UChar
-			Len := 1
-		_Log.Finest("Len = " Len)
-
-		Target_Field := NumGet(Source, Source_Ofs, Data_Type)
+		if ((_length := sizeof(pDataType)) > 0) {
+			pTarget.Insert(pKey, NumGet(pSource, pOffset, pDataType))
+			pOffset += _length
+		} else 
+			throw _log.Exit(Exception("Invalid data type: " pDataType))
 		
-		_Log.Output("Target_Field", Target_Field)
-		
-		return _Log.Exit(Len)
+		return _log.Exit()
 	}
+	;}}}
+	
+	;{{{ StructSet
+	StructSet(ByRef pSource, ByRef pTarget, ByRef pOffset) {
+		_log := new Logger("struct.class." A_ThisFunc)
+		
+		if (_log.Logs("Input")) {
+			_log.Input("&pSource", &pSource)
+			if (_log.Logs())
+				_log.All("pSource:`n" var_Hex_Dump(&pSource, 0, pSource.Size))
+			_log.Input("pOffset", pOffset)
+		}
+
+		pSource.Get(_data)
+		
+		iLength := pSource.Size
+		_targetAddr := &pTarget+pOffset
+		DllCall("RtlMoveMemory", "Ptr", _targetAddr, "Ptr", &_data, "UInt", iLength)
+
+		pOffset += iLength		
+		
+		return _log.Exit()
+	}
+	;}}}
+	
+	;{{{ MemberSet
+	MemberSet(pSource, ByRef pTarget, ByRef pOffset, pDataType) {
+		_log := new Logger("struct.class." A_ThisFunc)
+		
+		if (_log.Logs("Input")) {
+			_log.Input("pSource", pSource)
+			_log.Input("pOffset", pOffset)
+			_log.Input("pDataType", pDataType)
+		}
+		
+		if ((iLength := sizeof(pDataType)) > 0) {
+			NumPut(pSource, pTarget, pOffset, pDataType)
+			pOffset += iLength
+		} else
+			throw _log.Exit(Exception("Invalid data type: " pDataType))
+		
+		return _log.Exit()
+	}
+	;}}}
 }
+;}}}
+
+;{{{ sizeof
+sizeof(pType) {
+	if (IsObject(pType) && pType.Base.__Class = "Struct")
+		return pType.Size
+	else if pType = Ptr
+		return A_PtrSize
+	else if pType in Int64,Double
+		return 8
+	else if pType in Int,UInt,Float
+		return 4
+	else if pType in Short,UShort
+		return 2
+	else if pType in Char,UChar
+		return 1
+
+	return 0
+}
+;}}}
+

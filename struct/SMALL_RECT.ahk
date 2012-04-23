@@ -1,4 +1,9 @@
-;{{{ SMALL_RECT 
+/*
+:encoding=UTF-8:
+:subdir=struct:
+*/
+
+;{{{ SMALL_RECT class
 /*
 typedef struct _SMALL_RECT {
   SHORT Left;
@@ -8,6 +13,7 @@ typedef struct _SMALL_RECT {
 } SMALL_RECT;
 */
 class SMALL_RECT extends Struct {
+	
 	static Size := 8
 	
 	Left   := 0
@@ -16,54 +22,65 @@ class SMALL_RECT extends Struct {
 	Bottom := 0
 	
 	;{{{ __New
-	__New(ByRef Data = "") {
-		_Log := new Logger("struct.class." A_ThisFunc)
+	__New(ByRef pData = "") {
+		_log := new Logger("struct.class." A_ThisFunc)
 		
-		if (Data <> "")
-			This.Set(Data)
+		if (pData <> "")
+			this.Set(pData)
 		
-		_Log.Exit(This)
+		_log.Exit(this)
 	}
 	;}}}
 	
 	;{{{ Set
-	Set(ByRef Data) {
-		_Log := new Logger("struct.class." A_ThisFunc)
+	Set(ByRef pData) {
+		_log := new Logger("struct.class." A_ThisFunc)
 		
-		if (_Log.Logs("Input"))
-			_Log.Input("Data", "`n" var_Hex_Dump(&Data, 0, SMALL_RECT.Size))
+		if (_log.Logs("Input")) {
+			_log.Input("&pData", &pData)
+			if (_log.Logs())
+				_log.Input("pData:`n" var_Hex_Dump(&pData, 0, sizeof(SMALL_RECT)))
+		}
 			
-		This.Left   := NumGet(Data, Ofs:=0, "Short")
-		This.Top    := NumGet(Data, Ofs+=2, "Short")
-		This.Right  := NumGet(Data, Ofs+=2, "Short")
-		This.Bottom := NumGet(Data, Ofs+=2, "Short"), Ofs+=2
-		if (_Log.Logs("Finest")) {
-			_Log.Finest("Left = ",   This.Left)
-			_Log.Finest("Top = ",    This.Top)
-			_Log.Finest("Right = ",  This.Right)
-			_Log.Finest("Bottom = ", This.Bottom)
+		this.MemberGet(pData, _ofs:=0, this, "Left",   "Short")
+		this.MemberGet(pData, _ofs,    this, "Top",    "Short")
+		this.MemberGet(pData, _ofs,    this, "Right",  "Short")
+		this.MemberGet(pData, _ofs,    this, "Bottom", "Short")
+		if (_log.Logs("Finest")) {
+			_log.Finest("Left = ",   this.Left)
+			_log.Finest("Top = ",    this.Top)
+			_log.Finest("Right = ",  this.Right)
+			_log.Finest("Bottom = ", this.Bottom)
 		}
 		
-		return _Log.Exit(Ofs)
+		return _Log.Exit()
 	}
+	;}}}
 	
-	Get(ByRef Data) {
-		_Log := new Logger("struct.class." A_ThisFunc)
+	;{{{ Get
+	Get(ByRef pData) {
+		_log := new Logger("struct.class." A_ThisFunc)
 		
-		VarSetCapacity(Data, SMALL_RECT.Size, 0)
-		NumPut(This.Left,   Data, Ofs:=0, "Short")
-		NumPut(This.Top,    Data, Ofs+=2, "Short")
-		NumPut(This.Right,  Data, Ofs+=2, "Short")
-		NumPut(This.Bottom, Data, Ofs+=2, "Short")
-		Ofs+=2
+		iLength := sizeof(SMALL_RECT)
+		if (_log.Logs("Finest")) {
+			_log.Finest("iLength = " iLength)
+			_log.Finest("Left = " this.Left)
+			_log.Finest("Top = " this.Top)
+			_log.Finest("Rigth = " this.Right)
+			_log.Finest("Bottom = " this.Bottom)
+		}
+		VarSetCapacity(Data, iLength, 0)
+		this.MemberSet(this.Left,   pData, _ofs:=0, "Short")
+		this.MemberSet(this.Top,    pData, _ofs,    "Short")
+		this.MemberSet(this.Right,  pData, _ofs,    "Short")
+		this.MemberSet(this.Bottom, pData, _ofs,    "Short")
 		
-		if (_Log.Logs("Output"))
-			_Log.Output("Data", "`n" var_Hex_Dump(&Data, 0, SMALL_RECT.Size))
+		if (_Log.Logs())
+			_Log.All("Data", "`n" var_Hex_Dump(&pData, 0, iLength))
 		
-		return _Log.Exit(Ofs)
+		return _Log.Exit()
 	}
-;}}}
-
+	;}}}
 }
 ;}}}
 

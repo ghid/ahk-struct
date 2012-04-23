@@ -1,8 +1,12 @@
-#Include <Struct>
+/*
+:encoding=UTF-8:
+:subdir=struct:
+*/
+
 #Include <struct\COORD>
 #Include <struct\SMALL_RECT>
 
-;{{{ CONSOLE_SCREEN_BUFFER_INFO
+;{{{ CONSOLE_SCREEN_BUFFER_INFO class
 /*
 typedef struct _CONSOLE_SCREEN_BUFFER_INFO {
   COORD      dwSize;
@@ -13,87 +17,103 @@ typedef struct _CONSOLE_SCREEN_BUFFER_INFO {
 } CONSOLE_SCREEN_BUFFER_INFO;
 */
 class CONSOLE_SCREEN_BUFFER_INFO extends Struct {
-	static Size := 24
+	
+	static Size := 22
 	
 	; Character Attributes
-	static FOREGROUND_BLUE  :=  0x1
-	static FOREGROUND_GREEN :=  0x2
-	static FOREGROUND_RED   :=  0x4
-	static BACKGROUND_BLUE  := 0x10
-	static BACKGROUND_GREEN := 0x20
-	static BACKGROUND_RED   := 0x40
+	static FOREGROUND_BLUE  		:= 0x01
+	static FOREGROUND_GREEN 		:= 0x02
+	static FOREGROUND_RED   		:= 0x04
+	static BACKGROUND_BLUE  		:= 0x10
+	static BACKGROUND_GREEN 		:= 0x20
+	static BACKGROUND_RED		:= 0x40
+	static FOREGROUND_INTENSITY	:= 0x08
+	static BACKGROUND_INTENSITY	:= 0x80
 	
-	static FOREGROUND_INTENSITY :=  0x8
-	static BACKGROUND_INTENSITY := 0x80
-	
-	Coord_Size                := new COORD()
-	Coord_CursorPosition      := new COORD()
-	Attributes                := 0
-	Small_Rect_Window         := new SMALL_RECT()
-	Coord_Maximum_Window_Size := new COORD()
+	dwSize				:= new COORD()
+	dwCursorPosition		:= new COORD()
+	wAttributes			:= 0
+	srWindow				:= new SMALL_RECT()
+	dwMaximumWindowSize	:= new COORD()
 	
 	;{{{ __New
-	__New(ByRef Data = "") {
-		_Log := new Logger("struct.class." A_ThisFunc)
+	__New(ByRef pData = "") {
+		_log := new Logger("struct.class." A_ThisFunc)
 		
-		if (Data <> "")
-			This.Set(Data)
+		if (pData <> "")
+			this.Set(pData)
 			
-		_Log.Exit(This)
+		_log.Exit(this)
 	}
 	;}}}
 
-	Set(ByRef Data) {
+	;{{{ Set
+	Set(ByRef pData) {
+		_log := new Logger("struct.class." A_ThisFunc)
+		
+		if (_log.Logs("Input")) {
+			_log.Input("&Data", &pData)
+			if (_log.Logs()) 
+				_Log.All("pData`n" var_Hex_Dump(&pData, 0, sizeof(CONSOLE_SCREEN_BUFFER_INFO)))
+		}
+		
+		try {
+			this.StructGet(pData, _ofs:=0, this.dwSize)
+			this.StructGet(pData, _ofs, 	 this.dwCursorPosition)
+			this.MemberGet(pData, _ofs,	 this, "wAttributes", "UShort")
+			this.StructGet(pData, _ofs,	 this.srWindow)
+			this.StructGet(pData, _ofs,	 this.dwMaximumWindowSize)		
+		} catch exInvalidDataType
+			throw _log.Exit(exInvalidDataType)
+			
+		return _Log.Exit()
+	}
+	;}}}
+
+	;{{{ Get
+	Get(ByRef pData) {
 		_Log := new Logger("struct.class." A_ThisFunc)
 		
-		if (_Log.Logs("Input"))
-			_Log.Input("Data", "...`n" var_Hex_Dump(&Data, 0, CONSOLE_SCREEN_BUFFER_INFO.Size))
+		iLength := sizeof(CONSOLE_SCREEN_BUFFER_INFO)
+		_log.Finest("iLength = " iLength)
+		VarSetCapacity(pData, iLength, 0)
+		try {
+			this.StructSet(this.dwSize, 				pData, _ofs:=0)
+			this.StructSet(this.dwCursorPosition, 	pData, _ofs)
+			this.MemberSet(this.wAttributes, 		pData, _ofs, "UShort")
+			this.StructSet(this.srWindow, 			pData, _ofs)
+			this.StructSet(this.dwMaximumWindowSize, pData, _ofs)
+		} catch exInvalidDataType
+			throw _log.Exit(exInvalidDataType)
 			
-		Len := Base.StructGet(This.Coord_Size, Data, Ofs:=0)
-		Len := Base.StructGet(This.Coord_CursorPosition, Data, Ofs+=Len)		
-		; This.Attributes := NumGet(Data, Ofs+=Len, "UInt")
-		Len := Base.FieldGet(This.Attributes, Data, Ofs+=Len, "UInt")
-		Len := Base.StructGet(This.Small_Rect_Window, Data, Ofs+=4)
-		Len := Base.StructGet(This.Coord_Maximum_Window_Size, Data, Ofs+=Len)		
+		if (_log.Logs())
+			_log.All("pData:`n" var_Hex_Dump(&pData, 0, iLength))
 			
-		return _Log.Exit(Ofs + Len)
+		return _Log.Exit()
 	}
-	
-	Get(ByRef Data) {
-		_Log := new Logger("struct.class." A_ThisFunc)
-		
-		VarSetCapacity(Data, 0, CONSOLE_SCREEN_BUFFER_INFO.Size)
-		sys_MemMove(Data, This.Coord_Size.Get(_Data), Ofs:=0, 0, COORD.Size)
-		sys_MemMove(Data, This.Coord_CursorPosition.Get(_Data), Ofs+=COORD.Size, 0, COORD.Size)
-		NumPut(This.Attributes, Data, Ofs+=COORD.Size, "UShort")
-		sys_MemMove(Data, This.Small_Rect_Window.Get(_Data), Ofs+=4, 0, SMALL_RECT.Size)
-		sys_MemMove(Data, This.Coord_Maximum_Window_Size.Get(_Data), Ofs+=SMALL_RECT.Size, 0, COORD.Size)
-		Ofs+=COORD.Size
-		
-		return _Log.Exit(Ofs)
-	}
-	
+	;}}}
+
 	;{{{ Has
 	Has(Character_Attributes) {
 		_Log := new Logger("struct.class." A_ThisFunc)
 		
 		_Log.Input("Character_Attributes", Character_Attributes)
 		
-		return _Log.Exit(This.Attributes & Character_Attributes)
+		return _Log.Exit(This.wAttributes & Character_Attributes)
 	}
 	;}}}
 
 	;{{{ Background_Color
 	Background_Color() {
 		_Log := new Logger("struct.class." A_ThisFunc)
-		return _Log.Exit(This.Attributes & 0xf0)
+		return _Log.Exit(This.wAttributes & 0xf0)
 	}
 	;}}}
 
 	;{{{ Foreground_Color
 	Foreground_Color() {
 		_Log := new Logger("struct.class." A_ThisFunc)
-		return _Log.Exit(This.Attributes & 0x0f)
+		return _Log.Exit(This.wAttributes & 0x0f)
 	}
 	;}}}
 
