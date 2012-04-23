@@ -103,15 +103,15 @@ class CONSOLE_SCREEN_BUFFER_INFO extends Struct {
 	}
 	;}}}
 
-	;{{{ Background_Color
-	Background_Color() {
+	;{{{ BackgroundColor
+	BackgroundColor() {
 		_Log := new Logger("struct.class." A_ThisFunc)
 		return _Log.Exit(This.wAttributes & 0xf0)
 	}
 	;}}}
 
-	;{{{ Foreground_Color
-	Foreground_Color() {
+	;{{{ ForegroundColor
+	ForegroundColor() {
 		_Log := new Logger("struct.class." A_ThisFunc)
 		return _Log.Exit(This.wAttributes & 0x0f)
 	}
