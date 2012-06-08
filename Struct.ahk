@@ -14,6 +14,7 @@ class Struct {
 			if (_log.Logs())
 				_log.All("pSource:`n" var_Hex_Dump(&pSource, pOffset, pTarget.Size))
 			_log.Input("pOffset", pOffset)
+			_log.Input("pTarget", pTarget)
 		}
 		
 		iLength := pTarget.Size
@@ -37,18 +38,33 @@ class Struct {
 		
 		if (_log.Logs("Input")) {
 			_log.Input("&pSource", &pSource)
-			if (_log.Logs())
+			if (_log.Logs("All") && sizeof(pDataType) > 0)
 				_log.All("pSource:`n" var_Hex_Dump(&pSource, pOffset, sizeof(pDataType)))
 			_log.Input("pOffset", pOffset)
+			_log.Input("pTarget", pTarget)
 			_log.Input("pKey", pKey)
 			_log.Input("pDataType", pDataType)
 		}
 		
+		_value := ""
 		if ((_length := sizeof(pDataType)) > 0) {
-			pTarget.Insert(pKey, NumGet(pSource, pOffset, pDataType))
+			pTarget.Insert(pKey, _value := NumGet(pSource, pOffset, pDataType))
 			pOffset += _length
+		} else if (RegExMatch(pDataType, "iO)(?P<Wide>w)?\w+\[(?P<Size>\d+)\]", _data)) {
+			if (_log.Logs(Logger.Finest)) {
+				_log.Finest("_data.Wide = " _data.Wide)
+				_log.Finest("_data.Size = " _data.Size)
+				if (_log.Logs(Logger.All))
+					_log.All("pSource:`n" var_Hex_Dump(&pSource, pOffset, (_data.Wide = "w" ? 2 : 1) * _data.Size))
+			}
+			_value := StrGet(&pSource+pOffset, _data.Size)
+			pTarget.Insert(pKey, _value)
+			pOffset += ((_data.Wide = "w" ? 2 : 1) * _data.Size)
 		} else 
 			throw _log.Exit(Exception("Invalid data type: " pDataType))
+			
+		if (_log.Logs(Logger.Finest))
+			_log.Finest("_value = " _value)
 		
 		return _log.Exit()
 	}
@@ -62,6 +78,7 @@ class Struct {
 			_log.Input("&pSource", &pSource)
 			if (_log.Logs())
 				_log.All("pSource:`n" var_Hex_Dump(&pSource, 0, pSource.Size))
+			_log.Input("pTarget", pTarget)
 			_log.Input("pOffset", pOffset)
 		}
 
@@ -83,6 +100,7 @@ class Struct {
 		
 		if (_log.Logs("Input")) {
 			_log.Input("pSource", pSource)
+			_log.Input("pTarget", pTarget)
 			_log.Input("pOffset", pOffset)
 			_log.Input("pDataType", pDataType)
 		}
@@ -90,6 +108,13 @@ class Struct {
 		if ((iLength := sizeof(pDataType)) > 0) {
 			NumPut(pSource, pTarget, pOffset, pDataType)
 			pOffset += iLength
+		} else if (RegExMatch(pDataType, "iO)(?P<Wide>w)?\w+\[(?P<Size>\d+)\]", _data)) {
+			if (_log.Logs(Logger.Finest)) {
+				_log.Finest("_data.Wide = " _data.Wide)
+				_log.Finest("_data.Size = " _data.Size)
+			}
+			StrPut(pSource, &pTarget+pOffset, _data.Size)
+			pOffset += ((_data.Wide = "w" ? 2 : 1) * _data.Size)
 		} else
 			throw _log.Exit(Exception("Invalid data type: " pDataType))
 		
