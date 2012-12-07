@@ -115,8 +115,16 @@ class Struct {
 			}
 			StrPut(pSource, &pTarget+pOffset, _data.Size)
 			pOffset += ((_data.Wide = "w" ? 2 : 1) * _data.Size)
+		} else if (pDataType = "Str") {
+			_strLen := StrLen(pSource) + 1
+			pSource .= Chr(0)
+			if (_log.Logs(Logger.Finest)) {
+				_log.Finest("_data.Length = " _strLen)
+			}
+			StrPut(pSource, &pTarget+pOffset, _strLen)
+			pOffset += _strLen
 		} else
-			throw _log.Exit(Exception("Invalid data type: " pDataType))
+			throw _log.Exit(Exception("Invalid data type for: " pDataType))
 		
 		return _log.Exit()
 	}
@@ -127,7 +135,10 @@ class Struct {
 ;{{{ sizeof
 sizeof(pType) {
 	if (IsObject(pType) && pType.Base.__Class = "Struct")
-		return pType.Size
+		if (if pType.Size <> -1)
+			return pType.Size
+		else
+			return pType.SizeOf()
 	else if pType = Ptr
 		return A_PtrSize
 	else if pType in Int64,Double
@@ -143,3 +154,10 @@ sizeof(pType) {
 }
 ;}}}
 
+class C {
+	static DWORD	:= "UInt"
+		 , HANDLE	:= "Ptr"
+		 , LPBYTE	:= "Ptr"
+		 , LPTSTR	:= "Str"
+		 , WORD	:= "UShort"
+}
