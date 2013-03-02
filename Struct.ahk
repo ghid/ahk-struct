@@ -12,7 +12,7 @@ class Struct {
 		if (_log.Logs("Input")) {
 			_log.Input("&pSource", &pSource)
 			if (_log.Logs())
-				_log.All("pSource:`n" var_Hex_Dump(&pSource, pOffset, pTarget.Size))
+				_log.All("pSource:`n" LoggingHelper.HexDump(&pSource, pOffset, pTarget.Size))
 			_log.Input("pOffset", pOffset)
 			_log.Input("pTarget", pTarget)
 		}
@@ -23,7 +23,7 @@ class Struct {
 		DllCall("RtlMoveMemory", "Ptr", &_data, "Ptr", &pSource+pOffset, "UInt", iLength)
 		
 		if (_log.Logs())
-			_log.All("_data:`n" var_Hex_Dump(&_data, 0, iLength))
+			_log.All("_data:`n" LoggingHelper.HexDump(&_data, 0, iLength))
 			
 		pTarget.Set(_data)
 		pOffset += iLength
@@ -39,7 +39,7 @@ class Struct {
 		if (_log.Logs("Input")) {
 			_log.Input("&pSource", &pSource)
 			if (_log.Logs("All") && sizeof(pDataType) > 0)
-				_log.All("pSource:`n" var_Hex_Dump(&pSource, pOffset, sizeof(pDataType)))
+				_log.All("pSource:`n" LoggingHelper.HexDump(&pSource, pOffset, sizeof(pDataType)))
 			_log.Input("pOffset", pOffset)
 			_log.Input("pTarget", pTarget)
 			_log.Input("pKey", pKey)
@@ -55,7 +55,7 @@ class Struct {
 				_log.Finest("_data.Wide = " _data.Wide)
 				_log.Finest("_data.Size = " _data.Size)
 				if (_log.Logs(Logger.All))
-					_log.All("pSource:`n" var_Hex_Dump(&pSource, pOffset, (_data.Wide = "w" ? 2 : 1) * _data.Size))
+					_log.All("pSource:`n" LoggingHelper.HexDump(&pSource, pOffset, (_data.Wide = "w" ? 2 : 1) * _data.Size))
 			}
 			_value := StrGet(&pSource+pOffset, _data.Size)
 			pTarget.Insert(pKey, _value)
@@ -77,7 +77,7 @@ class Struct {
 		if (_log.Logs("Input")) {
 			_log.Input("&pSource", &pSource)
 			if (_log.Logs())
-				_log.All("pSource:`n" var_Hex_Dump(&pSource, 0, pSource.Size))
+				_log.All("pSource:`n" LoggingHelper.HexDump(&pSource, 0, pSource.Size))
 			_log.Input("pTarget", pTarget)
 			_log.Input("pOffset", pOffset)
 		}
@@ -135,7 +135,7 @@ class Struct {
 ;{{{ sizeof
 sizeof(pType) {
 	if (IsObject(pType) && pType.Base.__Class = "Struct")
-		if (if pType.Size <> -1)
+		if (pType.Size <> -1)
 			return pType.Size
 		else
 			return pType.SizeOf()
@@ -159,5 +159,5 @@ class C {
 		 , HANDLE	:= "Ptr"
 		 , LPBYTE	:= "Ptr"
 		 , LPTSTR	:= "Str"
-		 , WORD	:= "UShort"
+		 , WORD		:= "UShort"
 }

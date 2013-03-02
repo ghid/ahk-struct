@@ -62,7 +62,7 @@ class CONSOLE_SCREEN_BUFFER_INFO extends Struct {
 		if (_log.Logs("Input")) {
 			_log.Input("&Data", &pData)
 			if (_log.Logs()) 
-				_Log.All("pData`n" var_Hex_Dump(&pData, 0, sizeof(CONSOLE_SCREEN_BUFFER_INFO)))
+				_Log.All("pData`n" LoggingHelper.HexDump(&pData, 0, sizeof(CONSOLE_SCREEN_BUFFER_INFO)))
 		}
 		
 		try {
@@ -86,16 +86,16 @@ class CONSOLE_SCREEN_BUFFER_INFO extends Struct {
 		_log.Finest("iLength = " iLength)
 		VarSetCapacity(pData, iLength, 0)
 		try {
-			this.StructSet(this.dwSize, 				pData, _ofs:=0)
-			this.StructSet(this.dwCursorPosition, 	pData, _ofs)
-			this.MemberSet(this.wAttributes, 		pData, _ofs, "UShort")
-			this.StructSet(this.srWindow, 			pData, _ofs)
+			this.StructSet(this.dwSize, 			 pData, _ofs:=0)
+			this.StructSet(this.dwCursorPosition, 	 pData, _ofs)
+			this.MemberSet(this.wAttributes, 		 pData, _ofs, "UShort")
+			this.StructSet(this.srWindow, 			 pData, _ofs)
 			this.StructSet(this.dwMaximumWindowSize, pData, _ofs)
 		} catch exInvalidDataType
 			throw _log.Exit(exInvalidDataType)
 			
 		if (_log.Logs())
-			_log.All("pData:`n" var_Hex_Dump(&pData, 0, iLength))
+			_log.All("pData:`n" LogginHelper.HexDump(&pData, 0, iLength))
 			
 		return _Log.Exit()
 	}

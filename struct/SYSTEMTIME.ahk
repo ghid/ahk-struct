@@ -46,7 +46,7 @@ class SYSTEMTIME extends Struct {
 		if (_log.Logs("Input")) {
 			_log.Input("&pData", &pData)
 			if (_log.Logs())
-				_log.All("pData:`n" var_Hex_Dump(&pData, 0, sizeof(SYSTEMTIME)))
+				_log.All("pData:`n" LoggingHelper.HexDump(&pData, 0, sizeof(SYSTEMTIME)))
 		}
 			
 		this.MemberGet(pData, _ofs:=0, this, "wYear",         "Short")
@@ -99,7 +99,7 @@ class SYSTEMTIME extends Struct {
 		this.MemberSet(this.wMilliseconds, pData, _ofs,    "Short")
 		
 		if (_log.Logs())
-			_log.All("Data:`n" var_Hex_Dump(&pData, 0, iLength))
+			_log.All("Data:`n" LoggingHelper.HexDump(&pData, 0, iLength))
 		
 		return _Log.Exit()
 	}
