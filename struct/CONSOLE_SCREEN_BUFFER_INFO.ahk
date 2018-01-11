@@ -86,10 +86,10 @@ class CONSOLE_SCREEN_BUFFER_INFO extends Struct {
 		_log.Finest("iLength = " iLength)
 		VarSetCapacity(pData, iLength, 0)
 		try {
-			this.StructSet(this.dwSize, 				pData, _ofs:=0)
-			this.StructSet(this.dwCursorPosition, 	pData, _ofs)
-			this.MemberSet(this.wAttributes, 		pData, _ofs, "UShort")
-			this.StructSet(this.srWindow, 			pData, _ofs)
+			this.StructSet(this.dwSize, 			 pData, _ofs:=0)
+			this.StructSet(this.dwCursorPosition, 	 pData, _ofs)
+			this.MemberSet(this.wAttributes, 		 pData, _ofs, "UShort")
+			this.StructSet(this.srWindow, 			 pData, _ofs)
 			this.StructSet(this.dwMaximumWindowSize, pData, _ofs)
 		} catch exInvalidDataType
 			throw _log.Exit(exInvalidDataType)
