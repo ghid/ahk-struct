@@ -48,7 +48,7 @@ class PROCESS_INFORMATION extends Struct {
 		if (_log.Logs(Logger.Input)) {
 			_log.Input("&Data", &pData)
 			if (_log.Logs()) 
-				_Log.All("pData`n" var_Hex_Dump(&pData, 0, sizeof(PROCESS_INFORMATION)))
+				_Log.All("pData`n" LoggingHelper.HexDump(&pData, 0, sizeof(PROCESS_INFORMATION)))
 		}
 		
 		try {
@@ -79,7 +79,7 @@ class PROCESS_INFORMATION extends Struct {
 			throw _log.Exit(exInvalidDataType)
 			
 		if (_log.Logs())
-			_log.All("pData:`n" var_Hex_Dump(&pData, 0, iLength))
+			_log.All("pData:`n" LoggingHelper.HexDump(&pData, 0, iLength))
 			
 		return _Log.Exit(_ofs + 1)
 	}

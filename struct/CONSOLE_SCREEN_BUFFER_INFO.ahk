@@ -62,7 +62,7 @@ class CONSOLE_SCREEN_BUFFER_INFO extends Struct {
 		if (_log.Logs("Input")) {
 			_log.Input("&Data", &pData)
 			if (_log.Logs()) 
-				_Log.All("pData`n" var_Hex_Dump(&pData, 0, sizeof(CONSOLE_SCREEN_BUFFER_INFO)))
+				_Log.All("pData`n" LoggingHelper.HexDump(&pData, 0, sizeof(CONSOLE_SCREEN_BUFFER_INFO)))
 		}
 		
 		try {
@@ -95,7 +95,7 @@ class CONSOLE_SCREEN_BUFFER_INFO extends Struct {
 			throw _log.Exit(exInvalidDataType)
 			
 		if (_log.Logs())
-			_log.All("pData:`n" var_Hex_Dump(&pData, 0, iLength))
+			_log.All("pData:`n" LoggingHelper.HexDump(&pData, 0, iLength))
 			
 		return _Log.Exit()
 	}

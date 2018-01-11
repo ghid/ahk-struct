@@ -39,7 +39,7 @@ class SMALL_RECT extends Struct {
 		if (_log.Logs("Input")) {
 			_log.Input("&pData", &pData)
 			if (_log.Logs())
-				_log.Input("pData:`n" var_Hex_Dump(&pData, 0, sizeof(SMALL_RECT)))
+				_log.Input("pData:`n" LoggingHelper.HexDump(&pData, 0, sizeof(SMALL_RECT)))
 		}
 			
 		this.MemberGet(pData, _ofs:=0, this, "Left",   "Short")
@@ -76,7 +76,7 @@ class SMALL_RECT extends Struct {
 		this.MemberSet(this.Bottom, pData, _ofs,    "Short")
 		
 		if (_Log.Logs())
-			_Log.All("Data", "`n" var_Hex_Dump(&pData, 0, iLength))
+			_Log.All("Data", "`n" LoggingHelper.HexDump(&pData, 0, iLength))
 		
 		return _Log.Exit()
 	}

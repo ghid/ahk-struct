@@ -39,7 +39,7 @@ class CONSOLE_READCONSOLE_CONTROL extends Struct {
 		if (_log.Logs("Input")) {
 			_log.Input("&pData", &pData)
 			if (_log.Logs())
-				_log.All("pData:`n" var_Hex_Dump(&pData, 0, sizeof(CONSOLE_READCONSOLE_CONTROL)))
+				_log.All("pData:`n" LoggingHelper.HexDump(&pData, 0, sizeof(CONSOLE_READCONSOLE_CONTROL)))
 		}
 			
 		this.MemberGet(pData, _ofs:=0, this, "nLength",           "UInt")
@@ -75,7 +75,7 @@ class CONSOLE_READCONSOLE_CONTROL extends Struct {
 		this.MemberSet(this.dwControlKeyState, pData, _ofs,    "UInt")
 		
 		if (_log.Logs())
-			_log.All("Data:`n" var_Hex_Dump(&pData, 0, nLength))
+			_log.All("Data:`n" LoggingHelper.HexDump(&pData, 0, nLength))
 		
 		return _Log.Exit()
 	}
